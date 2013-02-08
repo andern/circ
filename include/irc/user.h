@@ -17,9 +17,9 @@
 #ifndef _CIRC_USER_H
 #define _CIRC_USER_H
 struct ci_user {
-    char *nick;
-    char *name;
-    char *ident;
-    char *host;
+        char *nick;
+        char *name;
+        char *ident;
+        char *host;
 };
 #endif

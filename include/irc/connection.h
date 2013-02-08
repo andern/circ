@@ -17,12 +17,12 @@
 #ifndef _CIRC_CONNECTION_H
 #define _CIRC_CONNECTION_H
 
-#define "irc/user.h"
+#include "irc/user.h"
 
 struct ci_connection {
-    struct ci_user user;
-    char *server;
-    int port;
+        struct ci_user user;
+        char *server;
+        int port;
 };
 
 void ci_connect(struct ci_connection *con);
