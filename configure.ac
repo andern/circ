@@ -12,5 +12,13 @@ AC_CONFIG_SRCDIR([src])
 AC_PROG_CC
 AM_PROG_CC_C_O
 
+AC_CHECK_HEADERS([arpa/inet.h])
+AC_CHECK_HEADERS([netdb.h])
+AC_CHECK_HEADERS([netinet/in.h])
+AC_CHECK_HEADERS([stdlib.h])
+AC_CHECK_HEADERS([strings.h])
+AC_CHECK_HEADERS([sys/socket.h])
+
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

@@ -1,4 +1,10 @@
-/*
+/**
+ * @file    connection.c
+ * @author  Andreas Halle <andern@gmail.com>
+ * @version 0.1.0
+ *
+ * @section LICENSE
+ *
  * This file is part of circ.
  *
  * circ is free software: you can redistribute it and/or modify
@@ -13,6 +19,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with circ.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
+ * See header file for description.
  */
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -25,11 +35,19 @@
 
 #include "irc/connection.h"
 
-/*
- * Connect to the server stored in the connection struct. Authenticate using the
- * stored authentication details in the connection struct.
- */
-void ci_connect(struct ci_connection *con)
+static
+void
+authenticate(int* sock, struct sockaddr_in* server)
+{
+        sendto(sock, "NICK cbot\n", 10, 0, (struct sockaddr *)&server,
+                        sizeof(server));
+}
+
+
+
+
+void
+ci_connect(struct ci_connection *con)
 {
         int sock;
         struct sockaddr_in server;
@@ -43,18 +61,19 @@ void ci_connect(struct ci_connection *con)
         server.sin_port = con->port;
         server.sin_family = AF_INET;
 
-        int con_res = connect(sock, &server, sizeof(server));
+        int con_res = connect(sock, (struct sockaddr *)&server, sizeof(server));
         if (!con_res)
         {
                 puts("Could not connect to server.");
                 exit(-1);
         }
 
-        sendto(sock, "NICK cbot\n", 10, 0, &server, sizeof(server));
+        authenticate(&sock, &server);
 
-        while (1)
+        for (;;)
         {
-                int n = recvfrom(sock, recvbfr, 1024, 0, NULL, NULL);
+                printf("hei\n");
+                int n = recvfrom(sock, recvbfr, 10240, 0, NULL, NULL);
                 recvbfr[n] = 0;
                 puts(recvbfr);
         }
