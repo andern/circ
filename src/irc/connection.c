@@ -29,6 +29,7 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -54,7 +55,7 @@ void ci_connect(struct ci_connection *con)
 {
         int sock;
         int con_res;
-        struct sockaddr_in* server = calloc(1, sizeof(struct sockaddr_in));
+        struct sockaddr_in* server = calloc(1, sizeof(*server));
         char recvbfr[1024];
         char sendbfr[1024];
 
@@ -65,12 +66,11 @@ void ci_connect(struct ci_connection *con)
                 puts("Successfully created socket.");
 
         server->sin_addr.s_addr = inet_addr(con->server);
-        server->sin_port = con->port;
+        server->sin_port = htons(con->port);
         server->sin_family = AF_INET;
-        printf("%d\n", server->sin_addr.s_addr);
+        printf("%d\n", server->sin_port);
 
         con_res = connect(sock, (struct sockaddr*)server, sizeof(*server));
-        puts("Con?");
         if (con_res == -1)
                 perror("Connecting to server");
         else
@@ -78,12 +78,11 @@ void ci_connect(struct ci_connection *con)
 
         /* authenticate(sock, (struct sockaddr*)server); */
 
-        while (fgets(sendbfr, 10000, stdin) != NULL)
+        while (fgets(sendbfr, 1024, stdin) != NULL)
             {
                 int n;
                 sendto(sock, sendbfr, strlen(sendbfr), 0, (struct sockaddr *)server, sizeof(server));
-                puts("Hey");
-                n = recvfrom(sock, recvbfr, 10000, 0, NULL, NULL);
+                n = recvfrom(sock, recvbfr, 1024, 0, NULL, NULL);
                 recvbfr[n] = 0;
                 fputs(recvbfr,stdout);
             }
