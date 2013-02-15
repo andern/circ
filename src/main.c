@@ -22,13 +22,20 @@
 
 int main(void)
 {
+        struct ci_user user;
+        struct ci_connection con;
+
         puts("Creating user");
-        struct ci_user user = {"cbot", "cbot", "cbot", ""};
+        user.nick = "cbot";
+        user.ident = "cbot";
+        user.name = "cbot";
+        user.host = "";
 
         puts("Creating connection");
-        struct ci_connection con = {user, "195.159.0.90", 6667};
-
-        puts("Connecting to server");
+        con.user = user;
+        con.server = "195.159.0.90";
+        con.port = 6667;
+;
         ci_connect(&con);
 
         return (EXIT_SUCCESS);

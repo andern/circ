@@ -27,54 +27,64 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <stdlib.h>
 #include <strings.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include <stdio.h> // TODO: REMOVE
+#include <stdio.h>
 
 #include "irc/connection.h"
-
-static
-void
-authenticate(int* sock, struct sockaddr_in* server)
+/*
+static void authenticate(int sock, struct sockaddr* server)
 {
-        sendto(sock, "NICK cbot\n", 10, 0, (struct sockaddr *)&server,
-                        sizeof(server));
+        size_t sent;
+        char* nick = "NICK cbot\n";
+        puts("hmm.");
+        sendto(sock, "NICK cbot\n", 10, 0, server, 10);
+        sent = send(sock, nick, sizeof(nick), 0);
+        printf("%d\n", (int)sent);
 }
+*/
 
 
 
 
-void
-ci_connect(struct ci_connection *con)
+void ci_connect(struct ci_connection *con)
 {
         int sock;
-        struct sockaddr_in server;
+        int con_res;
+        struct sockaddr_in* server = calloc(1, sizeof(struct sockaddr_in));
         char recvbfr[1024];
         char sendbfr[1024];
 
         sock = socket(AF_INET, SOCK_STREAM, 0);
-        bzero(&server, sizeof(server));
+        if (sock == -1)
+                perror("Creating socket");
+        else
+                puts("Successfully created socket.");
 
-        server.sin_addr.s_addr = inet_addr(con->server);
-        server.sin_port = con->port;
-        server.sin_family = AF_INET;
+        server->sin_addr.s_addr = inet_addr(con->server);
+        server->sin_port = con->port;
+        server->sin_family = AF_INET;
+        printf("%d\n", server->sin_addr.s_addr);
 
-        int con_res = connect(sock, (struct sockaddr *)&server, sizeof(server));
-        if (!con_res)
-        {
-                puts("Could not connect to server.");
-                exit(-1);
-        }
+        con_res = connect(sock, (struct sockaddr*)server, sizeof(*server));
+        puts("Con?");
+        if (con_res == -1)
+                perror("Connecting to server");
+        else
+                puts("Successfully connected to server.");
 
-        authenticate(&sock, &server);
+        /* authenticate(sock, (struct sockaddr*)server); */
 
-        for (;;)
-        {
-                printf("hei\n");
-                int n = recvfrom(sock, recvbfr, 10240, 0, NULL, NULL);
+        while (fgets(sendbfr, 10000, stdin) != NULL)
+            {
+                int n;
+                sendto(sock, sendbfr, strlen(sendbfr), 0, (struct sockaddr *)server, sizeof(server));
+                puts("Hey");
+                n = recvfrom(sock, recvbfr, 10000, 0, NULL, NULL);
                 recvbfr[n] = 0;
-                puts(recvbfr);
-        }
+                fputs(recvbfr,stdout);
+            }
 }
