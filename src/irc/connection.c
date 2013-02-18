@@ -27,27 +27,67 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <stdarg.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include <stdio.h>
-
 #include "irc/connection.h"
-/*
-static void authenticate(int sock, struct sockaddr* server)
-{
-        size_t sent;
-        char* nick = "NICK cbot\n";
-        puts("hmm.");
-        sendto(sock, "NICK cbot\n", 10, 0, server, 10);
-        sent = send(sock, nick, sizeof(nick), 0);
-        printf("%d\n", (int)sent);
-}
-*/
+#include "error.h"
 
+static error_t send_nickline(int sock, struct sockaddr* server, char* nickname)
+{
+        size_t nicklen = strlen(nickname) + 7;
+        char* nickline;
+
+        /* TODO: Use server's NICKLEN instead of hardcoding NICKLEN=9 */
+        if (nicklen > 16)
+                return E_NICK_MAXLEN;
+
+        nickline = malloc(nicklen*sizeof(char));
+        sprintf(nickline, "NICK %s\n", nickname);
+        nickline[nicklen - 1] = '\0';
+
+        sendto(sock, nickline, nicklen, 0, server, sizeof(*server));
+
+        free(nickline);
+        return E_SUCCESS;
+}
+
+
+static error_t send_userline(int sock, struct sockaddr* server, char* ident,
+                            char* serverhost, char* name)
+{
+        size_t userlen = strlen(ident) + strlen(serverhost) + strlen(name) + 14;
+
+        /* TODO: Check maxlen of ident, server and name. */
+        char* userline = malloc(userlen*sizeof(char));
+        sprintf(userline, "USER %s %s bla :%s\n", ident, serverhost, name);
+        userline[userlen - 1] = '\0';
+
+        sendto(sock, userline, userlen, 0, server, sizeof(*server));
+
+        free(userline);
+        return E_SUCCESS;
+}
+
+
+
+static error_t authenticate(int sock, struct sockaddr* server,
+                            struct ci_connection con)
+{
+        error_t err;
+        err =  send_nickline(sock, server, con.user.nick);
+        if (err != E_SUCCESS)
+                return err;
+
+        err = send_userline(sock, server, con.user.ident, con.server,
+                            con.user.name);
+
+        return E_SUCCESS;
+}
 
 
 
@@ -57,7 +97,7 @@ void ci_connect(struct ci_connection *con)
         int con_res;
         struct sockaddr_in* server = calloc(1, sizeof(*server));
         char recvbfr[1024];
-        char sendbfr[1024];
+        /* char sendbfr[1024]; */
 
         sock = socket(AF_INET, SOCK_STREAM, 0);
         if (sock == -1)
@@ -68,7 +108,6 @@ void ci_connect(struct ci_connection *con)
         server->sin_addr.s_addr = inet_addr(con->server);
         server->sin_port = htons(con->port);
         server->sin_family = AF_INET;
-        printf("%d\n", server->sin_port);
 
         con_res = connect(sock, (struct sockaddr*)server, sizeof(*server));
         if (con_res == -1)
@@ -76,14 +115,14 @@ void ci_connect(struct ci_connection *con)
         else
                 puts("Successfully connected to server.");
 
-        /* authenticate(sock, (struct sockaddr*)server); */
+        authenticate(sock, (struct sockaddr*)server, *con);
 
-        while (fgets(sendbfr, 1024, stdin) != NULL)
-            {
+        while(1)
+        {
                 int n;
-                sendto(sock, sendbfr, strlen(sendbfr), 0, (struct sockaddr *)server, sizeof(server));
+                /* sendto(sock, sendbfr, strlen(sendbfr), 0, (struct sockaddr*)server, sizeof(server)); */
                 n = recvfrom(sock, recvbfr, 1024, 0, NULL, NULL);
                 recvbfr[n] = 0;
                 fputs(recvbfr,stdout);
-            }
+        }
 }
