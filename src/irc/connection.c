@@ -33,44 +33,45 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "irc/connection.h"
 #include "error.h"
 
 static error_t send_nickline(int sock, struct sockaddr* server, char* nickname)
 {
-        size_t nicklen = strlen(nickname) + 7;
+        size_t nicklen;
         char* nickline;
 
-        /* TODO: Use server's NICKLEN instead of hardcoding NICKLEN=9 */
-        if (nicklen > 16)
-                return E_NICK_MAXLEN;
+        /* TODO: Use server's NICKLEN instead of hard coding NICKLEN=9 */
+        nicklen = strlen(nickname) + 6;
+        if (nicklen > 15)
+                return (E_NICK_MAXLEN);
 
         nickline = malloc(nicklen*sizeof(char));
         sprintf(nickline, "NICK %s\n", nickname);
-        nickline[nicklen - 1] = '\0';
-
         sendto(sock, nickline, nicklen, 0, server, sizeof(*server));
-
         free(nickline);
-        return E_SUCCESS;
+
+        return (E_SUCCESS);
 }
 
 
 static error_t send_userline(int sock, struct sockaddr* server, char* ident,
                             char* serverhost, char* name)
 {
-        size_t userlen = strlen(ident) + strlen(serverhost) + strlen(name) + 14;
+        size_t userlen;
+        char* userline;
 
         /* TODO: Check maxlen of ident, server and name. */
-        char* userline = malloc(userlen*sizeof(char));
+        userlen = strlen(ident) + strlen(serverhost) + strlen(name) + 13;
+
+        userline = malloc(userlen*sizeof(char));
         sprintf(userline, "USER %s %s bla :%s\n", ident, serverhost, name);
-        userline[userlen - 1] = '\0';
-
         sendto(sock, userline, userlen, 0, server, sizeof(*server));
-
         free(userline);
-        return E_SUCCESS;
+
+        return (E_SUCCESS);
 }
 
 
@@ -81,12 +82,14 @@ static error_t authenticate(int sock, struct sockaddr* server,
         error_t err;
         err =  send_nickline(sock, server, con.user.nick);
         if (err != E_SUCCESS)
-                return err;
+                return (err);
 
         err = send_userline(sock, server, con.user.ident, con.server,
                             con.user.name);
+        if (err != E_SUCCESS)
+                return (err);
 
-        return E_SUCCESS;
+        return (E_SUCCESS);
 }
 
 
@@ -124,5 +127,7 @@ void ci_connect(struct ci_connection *con)
                 n = recvfrom(sock, recvbfr, 1024, 0, NULL, NULL);
                 recvbfr[n] = 0;
                 fputs(recvbfr,stdout);
+
+                sleep(1);
         }
 }
