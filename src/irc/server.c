@@ -1,5 +1,5 @@
 /**
- * @file    connection.h
+ * @file    server.c
  * @author  Andreas Halle <andern@gmail.com>
  * @version 0.1.0
  *
@@ -22,25 +22,23 @@
  *
  * @section DESCRIPTION
  *
- * A connection contains all the necessary details needed to connect to and
- * authenticate with an IRC server.
+ * See header file for description.
  */
-#ifndef _CIRC_CONNECTION_H
-#define _CIRC_CONNECTION_H
+#include <arpa/inet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
 
 #include "irc/server.h"
-#include "irc/user.h"
 
-struct ci_connection {
-        struct ci_user user;
-        struct ci_server server;
-};
+struct ci_server* ci_server_new(char* host, int port)
+{
+        struct ci_server* server = calloc(1, sizeof(*server));
+        server->host = host;
+        server->port = port;
 
-/**
- *
- * Connect to the server stored in the connection struct and authenticate using
- * the stored authentication details in the connection struct.
- */
-void ci_connect(struct ci_connection *con);
+        /* TODO: Implement IP resolve from hostname. */
+        server->ip = host;
 
-#endif
+        return server;
+}

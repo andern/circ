@@ -33,8 +33,8 @@ int main(void)
 
         puts("Creating connection");
         con.user = user;
-        con.server = "195.159.0.90";
-        con.port = 6667;
+        con.server.host = "195.159.0.90";
+        con.server.port = 6667;
 ;
         ci_connect(&con);
 

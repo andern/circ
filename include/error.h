@@ -22,8 +22,7 @@
  *
  * @section DESCRIPTION
  *
- * A connection contains all the necessary details needed to connect to and
- * authenticate with an IRC server.
+ * Contains error codes and error descriptions.
  */
 #ifndef _CIRC_ERROR_H
 #define _CIRC_ERROR_H
@@ -31,7 +30,8 @@
 typedef enum err_code
 {
     E_SUCCESS,
-    E_NICK_MAXLEN
+    E_NICK_MAXLEN,
+    E_URESOLVED_HOSTNAME
 } error_t;
 
 struct err_desc {
@@ -39,7 +39,8 @@ struct err_desc {
     char* message;
 } err_desc[] = {
     { E_SUCCESS, "" },
-    { E_NICK_MAXLEN, "Nickname reached maximum length"}
+    { E_NICK_MAXLEN, "Nickname reached maximum length"},
+    { E_URESOLVED_HOSTNAME, "Couldn't resolve hostname"}
 };
 
 #endif

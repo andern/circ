@@ -22,6 +22,6 @@ SRCDIR = src
 
 bin_PROGRAMS = circ
 
-circ_SOURCES = src/main.c src/irc/connection.c
+circ_SOURCES = src/main.c src/irc/connection.c src/irc/server.c
 
 circ_LDADD = ${circ_LIBS}
