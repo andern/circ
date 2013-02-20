@@ -31,16 +31,23 @@ typedef enum err_code
 {
     E_SUCCESS,
     E_NICK_MAXLEN,
-    E_URESOLVED_HOSTNAME
+    E_URESOLVED_HOSTNAME,
+    E_OOM
 } error_t;
+
+static char success[]     = "";
+static char nick_maxlen[] = "Nickname reached maximum length";
+static char ures_host[]   = "Could not resolve hostname";
+static char oom[]         = "Out of memory";
 
 struct err_desc {
     error_t code;
     char* message;
 } err_desc[] = {
-    { E_SUCCESS, "" },
-    { E_NICK_MAXLEN, "Nickname reached maximum length"},
-    { E_URESOLVED_HOSTNAME, "Couldn't resolve hostname"}
+    { E_SUCCESS, success },
+    { E_NICK_MAXLEN, nick_maxlen},
+    { E_URESOLVED_HOSTNAME, ures_host},
+    { E_OOM, oom}
 };
 
 #endif

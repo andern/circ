@@ -25,17 +25,23 @@ int main(void)
         struct ci_user user;
         struct ci_connection con;
 
-        puts("Creating user");
-        user.nick = "cbot";
-        user.ident = "cbot";
-        user.name = "cbot";
-        user.host = "";
+        char nick[] = "cbot";
+        char ident[] = "cbot";
+        char name[] = "cbot";
+        char host[] = "";
+
+        char servhost[] = "195.159.0.90";
+
+        user.nick = nick;
+        user.ident = ident;
+        user.name = name;
+        user.host = host;
 
         puts("Creating connection");
         con.user = user;
-        con.server.host = "195.159.0.90";
+        con.server.host = servhost;
         con.server.port = 6667;
-;
+
         ci_connect(&con);
 
         return (EXIT_SUCCESS);

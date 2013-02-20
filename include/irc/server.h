@@ -83,7 +83,7 @@ struct ci_server {
  *         port that the server listens to.
  * @return
  *         a pointer to a ci_server struct containing the servers host, port and
- *         resolved ip.
+ *         resolved ip. Return NULL on memory allocation error.
  */
 struct ci_server* ci_server_new(char* host, int port);
 

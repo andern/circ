@@ -36,23 +36,30 @@
 #include "irc/connection.h"
 #include "error.h"
 
-static error_t send_nickline(int sock, struct sockaddr* server, char* nickname,
-                             size_t s_nicklen)
+#define BFRSIZE 1024
+
+static error_t send_nickline(const int sock, const struct sockaddr* server,
+                             const char nickname[], const size_t s_nicklen)
 {
         size_t nicklen;
         char* nickline;
 
-        nicklen = strlen(nickname) + 6;
-        if (nicklen > (s_nicklen + 6))
+        nicklen = strlen(nickname);
+        if (nicklen > s_nicklen) /* Servers have different nicklen config */
                 return E_NICK_MAXLEN;
 
+        nicklen += 6; /* Count for "NICK " and \n */
         nickline = malloc(nicklen*sizeof(char));
+        if (nickline == NULL)
+                return E_OOM;
+
         sprintf(nickline, "NICK %s\n", nickname);
         sendto(sock, nickline, nicklen, 0, server, sizeof(*server));
         free(nickline);
 
         return E_SUCCESS;
 }
+
 
 
 static error_t send_userline(int sock, struct sockaddr* server, char* ident,
@@ -65,6 +72,9 @@ static error_t send_userline(int sock, struct sockaddr* server, char* ident,
         userlen = strlen(ident) + strlen(name) + 13;
 
         userline = malloc(userlen*sizeof(char));
+        if (userline == NULL)
+                return E_OOM;
+
         sprintf(userline, "USER %s x x :%s\n", ident, name);
         sendto(sock, userline, userlen, 0, server, sizeof(*server));
         free(userline);
@@ -97,7 +107,7 @@ void ci_connect(struct ci_connection *con)
         int con_res;
         error_t err;
         struct sockaddr_in* server = calloc(1, sizeof(*server));
-        char recvbfr[1024];
+        char recvbfr[BFRSIZE];
 
         sock = socket(AF_INET, SOCK_STREAM, 0);
         if (sock == -1)
@@ -121,8 +131,8 @@ void ci_connect(struct ci_connection *con)
 
         while(1)
         {
-                int n;
-                n = recvfrom(sock, recvbfr, 1024, 0, NULL, NULL);
+                ssize_t n;
+                n = recvfrom(sock, recvbfr, BFRSIZE, 0, NULL, NULL);
                 recvbfr[n] = 0;
                 fputs(recvbfr, stdout);
         }
