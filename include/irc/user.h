@@ -1,4 +1,10 @@
-/*
+/**
+ * @file    user.h
+ * @author  Andreas Halle <andern@gmail.com>
+ * @version 0.1.0
+ *
+ * @section LICENSE
+ *
  * This file is part of circ.
  *
  * circ is free software: you can redistribute it and/or modify
@@ -13,6 +19,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with circ.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
+ * A user contains information that is to be sent to an IRC server during
+ * authentication.
  */
 #ifndef _CIRC_USER_H
 #define _CIRC_USER_H

@@ -101,13 +101,50 @@ static error_t authenticate(int sock, struct sockaddr* server,
 
 
 
+static void parse(int sock, char recvbfr[], size_t len, char sendbfr[],
+                 const struct sockaddr* server)
+{
+        if (strncmp(recvbfr, "PING", 4) == 0)
+        {
+                strncpy(sendbfr, recvbfr, len);
+                sendbfr[1] = 'O';
+                sendto(sock, sendbfr, len, 0,  server, sizeof(server));
+        }
+}
+
+
+
+static void communicate(int sock, struct sockaddr* server)
+{
+        ssize_t n;
+        char recvbfr[BFRSIZE];
+        char sendbfr[BFRSIZE];
+
+        while(1)
+        {
+                n = recvfrom(sock, recvbfr, BFRSIZE, 0, NULL, NULL);
+                if (n == -1)
+                {
+                        fprintf(stderr, "%s: %s\n", "WARNING",
+                               "Failed to receive a message from the server.");
+                }
+                else 
+                {
+                        recvbfr[n] = '\0';
+                        fputs(recvbfr, stdout);
+                        parse(sock, recvbfr, (size_t)n, sendbfr, server);
+                }
+        }
+}
+
+
+
 void ci_connect(struct ci_connection *con)
 {
         int sock;
         int con_res;
         error_t err;
         struct sockaddr_in* server = calloc(1, sizeof(*server));
-        char recvbfr[BFRSIZE];
 
         sock = socket(AF_INET, SOCK_STREAM, 0);
         if (sock == -1)
@@ -128,12 +165,8 @@ void ci_connect(struct ci_connection *con)
                         err_desc[err].message);
                 exit(1);
         }
-
-        while(1)
-        {
-                ssize_t n;
-                n = recvfrom(sock, recvbfr, BFRSIZE, 0, NULL, NULL);
-                recvbfr[n] = 0;
-                fputs(recvbfr, stdout);
-        }
+        communicate(sock, (struct sockaddr*)server);
 }
+
+
+

@@ -87,4 +87,6 @@ struct ci_server {
  */
 struct ci_server* ci_server_new(char* host, int port);
 
+void ci_server_free(struct ci_server* server);
+
 #endif

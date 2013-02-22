@@ -1,5 +1,5 @@
 /**
- * @file    connection.h
+ * @file    parse.c
  * @author  Andreas Halle <andern@gmail.com>
  * @version 0.1.0
  *
@@ -22,27 +22,6 @@
  *
  * @section DESCRIPTION
  *
- * A connection contains all the necessary details needed to connect to and
- * authenticate with an IRC server.
+ * See header file for description.
  */
-#ifndef _CIRC_CONNECTION_H
-#define _CIRC_CONNECTION_H
-
-#include "irc/server.h"
-#include "irc/user.h"
-
-struct ci_connection {
-        struct ci_user user;
-        struct ci_server server;
-};
-
-/**
- * Connect to the server stored in the connection struct and authenticate using
- * the stored authentication details in the connection struct.
- *
- * @param con
- *        ci_connection struct where connection info is stored.
- */
-void ci_connect(struct ci_connection* con);
-
-#endif
+error_t ci_pmsg();

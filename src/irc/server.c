@@ -34,6 +34,9 @@
 struct ci_server* ci_server_new(char* host, int port)
 {
         struct ci_server* server = calloc(1, sizeof(*server));
+        if (server == NULL)
+                return NULL;
+
         server->host = host;
         server->port = port;
 
@@ -41,4 +44,15 @@ struct ci_server* ci_server_new(char* host, int port)
         server->ip = host;
 
         return server;
+}
+
+
+
+void ci_server_free(struct ci_server* server)
+{
+        free(server->host);
+        free(server->ip);
+        free(server->chantypes);
+        free(server->chanmodes);
+        free(server->network);
 }
