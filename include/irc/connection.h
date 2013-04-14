@@ -43,6 +43,6 @@ struct ci_connection {
  * @param con
  *        ci_connection struct where connection info is stored.
  */
-void ci_connect(struct ci_connection* con);
+void ci_connect(const struct ci_connection* con);
 
 #endif

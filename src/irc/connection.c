@@ -38,8 +38,8 @@
 
 #define BFRSIZE 1024
 
-static error_t send_nickline(const int sock, const struct sockaddr* server,
-                             const char nickname[], const size_t s_nicklen)
+static error_t send_nickline(int sock, const struct sockaddr* server,
+                             const char nickname[], size_t s_nicklen)
 {
         size_t nicklen;
         char* nickline;
@@ -62,8 +62,8 @@ static error_t send_nickline(const int sock, const struct sockaddr* server,
 
 
 
-static error_t send_userline(int sock, struct sockaddr* server, char* ident,
-                             char* name)
+static error_t send_userline(int sock, const struct sockaddr* server,
+                             const char* ident, const char* name)
 {
         size_t userlen;
         char* userline;
@@ -84,15 +84,15 @@ static error_t send_userline(int sock, struct sockaddr* server, char* ident,
 
 
 
-static error_t authenticate(int sock, struct sockaddr* server,
-                            struct ci_connection con)
+static error_t authenticate(int sock, const struct sockaddr* server,
+                            const struct ci_connection* con)
 {
         error_t err;
-        err =  send_nickline(sock, server, con.user.nick, 9);
+        err =  send_nickline(sock, server, con->user.nick, 9);
         if (err != E_SUCCESS)
                 return err;
 
-        err = send_userline(sock, server, con.user.ident, con.user.name);
+        err = send_userline(sock, server, con->user.ident, con->user.name);
         if (err != E_SUCCESS)
                 return err;
 
@@ -101,8 +101,8 @@ static error_t authenticate(int sock, struct sockaddr* server,
 
 
 
-static void parse(int sock, char recvbfr[], size_t len, char sendbfr[],
-                 const struct sockaddr* server)
+static void parse(int sock, const char recvbfr[], size_t len,
+                  char sendbfr[], const struct sockaddr* server)
 {
         if (strncmp(recvbfr, "PING", 4) == 0)
         {
@@ -114,7 +114,7 @@ static void parse(int sock, char recvbfr[], size_t len, char sendbfr[],
 
 
 
-static void communicate(int sock, struct sockaddr* server)
+static void communicate(int sock, const struct sockaddr* server)
 {
         ssize_t n;
         char recvbfr[BFRSIZE];
@@ -139,7 +139,7 @@ static void communicate(int sock, struct sockaddr* server)
 
 
 
-void ci_connect(struct ci_connection *con)
+void ci_connect(const struct ci_connection *con)
 {
         int sock;
         int con_res;
@@ -158,7 +158,7 @@ void ci_connect(struct ci_connection *con)
         if (con_res == -1)
                 perror("Connecting to server");
 
-        err = authenticate(sock, (struct sockaddr*)server, *con);
+        err = authenticate(sock, (struct sockaddr*)server, con);
         if (err != E_SUCCESS)
         {
                 fprintf(stderr, "%s: %s\n", "Error connecting to IRC server",
@@ -167,6 +167,3 @@ void ci_connect(struct ci_connection *con)
         }
         communicate(sock, (struct sockaddr*)server);
 }
-
-
-
