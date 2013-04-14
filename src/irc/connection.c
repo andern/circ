@@ -49,7 +49,7 @@ static error_t send_nickline(const int sock, const struct sockaddr* server,
                 return E_NICK_MAXLEN;
 
         nicklen += 6; /* Count for "NICK " and \n */
-        nickline = malloc(nicklen*sizeof(char));
+        nickline = malloc((nicklen+1)*sizeof(char)); /* +1 for 0 termination */
         if (nickline == NULL)
                 return E_OOM;
 
