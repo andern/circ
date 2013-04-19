@@ -151,7 +151,7 @@ void ci_connect(const struct ci_connection *con)
                 perror("Creating socket");
 
         server->sin_addr.s_addr = inet_addr(con->server.host);
-        server->sin_port = htons(con->server.port);
+        server->sin_port = htons((uint16_t)con->server.port);
         server->sin_family = AF_INET;
 
         con_res = connect(sock, (struct sockaddr*)server, sizeof(*server));
