@@ -24,35 +24,6 @@
  *
  * See header file for description.
  */
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-
 #include "irc/server.h"
 
-struct ci_server* ci_server_new(char* host, int port)
-{
-        struct ci_server* server = calloc(1, sizeof(*server));
-        if (server == NULL)
-                return NULL;
-
-        server->host = host;
-        server->port = port;
-
-        /* TODO: Implement IP resolve from hostname. */
-        server->ip = host;
-
-        return server;
-}
-
-
-
-void ci_server_free(struct ci_server* server)
-{
-        free(server->host);
-        free(server->ip);
-        free(server->chantypes);
-        free(server->chanmodes);
-        free(server->network);
-}
+/* Nothing here yet. */

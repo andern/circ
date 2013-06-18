@@ -101,6 +101,22 @@ static error_t authenticate(int sock, const struct sockaddr* server,
 
 
 
+static error_t resolve_hostname(const char* hostname, char* ip)
+{
+        struct addrinfo* res;
+        struct sockaddr_in* addr;
+        int ecode;
+
+        ecode = getaddrinfo(hostname, NULL, NULL, &res);
+        if (ecode != 0) return E_URESOLVED_HOSTNAME;
+        addr = (struct sockaddr_in*) res->ai_addr;
+        strcpy(ip, inet_ntoa(addr->sin_addr));
+
+        return E_SUCCESS;
+}
+
+
+
 static void parse(int sock, const char recvbfr[], size_t len,
                   char sendbfr[], const struct sockaddr* server)
 {
@@ -150,7 +166,15 @@ void ci_connect(const struct ci_connection *con)
         if (sock == -1)
                 perror("Creating socket");
 
-        server->sin_addr.s_addr = inet_addr(con->server.host);
+        err = resolve_hostname(con->server.host, con->server.ip);
+        if (err != E_SUCCESS)
+        {
+                fprintf(stderr, "%s: %s\n", "Error connecting to IRC server",
+                        err_desc[err].message);
+                exit(1);
+        }
+
+        server->sin_addr.s_addr = inet_addr(con->server.ip);
         server->sin_port = htons((uint16_t)con->server.port);
         server->sin_family = AF_INET;
 
@@ -165,5 +189,6 @@ void ci_connect(const struct ci_connection *con)
                         err_desc[err].message);
                 exit(1);
         }
+        /* Start infinite loop */
         communicate(sock, (struct sockaddr*)server);
 }

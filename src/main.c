@@ -30,7 +30,7 @@ int main(void)
         char name[] = "cbot";
         char host[] = "";
 
-        char servhost[] = "195.159.0.90";
+        char servhost[] = "irc.homelien.no";
 
         user.nick = nick;
         user.ident = ident;

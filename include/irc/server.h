@@ -71,22 +71,4 @@ struct ci_server {
         int topiclen;
 };
 
-
-
-/**
- * Construct and allocate memory for a new ci_server struct and resolve the ip
- * of the given hostname.
- *
- * @param  host
- *         hostname of the server.
- * @param  port
- *         port that the server listens to.
- * @return
- *         a pointer to a ci_server struct containing the servers host, port and
- *         resolved ip. Return NULL on memory allocation error.
- */
-struct ci_server* ci_server_new(char* host, int port);
-
-void ci_server_free(struct ci_server* server);
-
 #endif
