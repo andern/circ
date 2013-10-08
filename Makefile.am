@@ -21,7 +21,7 @@ AM_CPPFLAGS = -Iinclude\
               -Wmissing-field-initializers -Wpacked -Wnested-externs -Winline\
               -Wvla -Wall -Wno-missing-braces -Wextra -Wstack-protector\
               -Wunsuffixed-float-constants\
-			  -D_POSIX_C_SOURCE=1
+              -D_POSIX_C_SOURCE=1
 
               #-Wno-missing-field-initializers -Wformat=2 -Wswitch-default \
               #-Wswitch-enum -Wcast-align -Wpointer-arith -Wbad-function-cast \
