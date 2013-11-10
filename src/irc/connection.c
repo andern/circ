@@ -111,6 +111,7 @@ static error_t resolve_hostname(const char* hostname, char* ip)
         ecode = getaddrinfo(hostname, NULL, NULL, &res);
         if (ecode != 0) return E_URESOLVED_HOSTNAME;
         addr = (struct sockaddr_in*) res->ai_addr;
+        ip = malloc(sizeof(char) * res->ai_addrlen);
         strcpy(ip, inet_ntoa(addr->sin_addr));
 
         return E_SUCCESS;
