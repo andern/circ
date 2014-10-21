@@ -102,7 +102,7 @@ static error_t authenticate(int sock, const struct sockaddr* server,
 
 
 
-static error_t resolve_hostname(const char* hostname, char* ip)
+static error_t resolve_hostname(const char* hostname, char** ip)
 {
         struct addrinfo* res;
         struct sockaddr_in* addr;
@@ -110,9 +110,10 @@ static error_t resolve_hostname(const char* hostname, char* ip)
 
         ecode = getaddrinfo(hostname, NULL, NULL, &res);
         if (ecode != 0) return E_URESOLVED_HOSTNAME;
+
         addr = (struct sockaddr_in*) res->ai_addr;
-        ip = malloc(sizeof(char) * res->ai_addrlen);
-        strcpy(ip, inet_ntoa(addr->sin_addr));
+        *ip = malloc(sizeof(char) * res->ai_addrlen);
+        strcpy(*ip, inet_ntoa(addr->sin_addr));
 
         return E_SUCCESS;
 }
@@ -157,7 +158,7 @@ static void communicate(int sock, const struct sockaddr* server)
 
 
 
-void ci_connect(const struct ci_connection *con)
+void ci_connect(struct ci_connection *con)
 {
         int sock;
         int con_res;
@@ -168,7 +169,7 @@ void ci_connect(const struct ci_connection *con)
         if (sock == -1)
                 perror("Creating socket");
 
-        err = resolve_hostname(con->server.host, con->server.ip);
+        err = resolve_hostname(con->server.host, &con->server.ip);
         if (err != E_SUCCESS)
         {
                 fprintf(stderr, "%s: %s\n", "Error connecting to IRC server",
